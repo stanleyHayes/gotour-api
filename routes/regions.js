@@ -1,10 +1,10 @@
 const {
-  getRegions,
-  getRegion,
-  createRegion,
-  updateRegion,
-  deleteRegion,
-} = require('../controllers/Region');
+    getRegions,
+    getRegion,
+    createRegion,
+    updateRegion,
+    deleteRegion,
+} = require('../controllers/region');
 
 const express = require('express');
 const router = express.Router();

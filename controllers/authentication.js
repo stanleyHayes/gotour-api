@@ -2,6 +2,7 @@ const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/error-response');
 const User = require('../models/User');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 //Description:    Register user
 //route:          POST/api/v1/auth/register
@@ -10,20 +11,18 @@ exports.register = asyncHandler(async function (req, res, next) {
   const { email, password, phone, name, role } = req.body;
 
   const userFromDB = await User.findOne({ email: email });
-  let crerateUser;
+  let createdUser;
 
   if (userFromDB) {
     return next(
       new ErrorResponse(`Account with email ${email} already exist`, 409)
     );
   }
-  crerateUser = await User.create({ email, password, phone, name, role });
+  createdUser = await User.create({ email, password, phone, name, role });
 
   res.status(200).json({
     success: true,
     data: createdUser,
-    token: token,
-    message: 'Message sent',
   });
 });
 
@@ -32,7 +31,7 @@ exports.register = asyncHandler(async function (req, res, next) {
 //access:         public
 exports.login = asyncHandler(async function (req, res, next) {
   const { email, password } = req.body;
-  if (email || !password) {
+  if (!email || !password) {
     return next(new ErrorResponse('Provide email and password', 400));
   }
 
@@ -40,7 +39,7 @@ exports.login = asyncHandler(async function (req, res, next) {
   if (!user) {
     return next(new ErrorResponse('Invalid credentionals', 401));
   }
-  const isMatch = await user.matchPassowrd(password);
+  const isMatch = await user.matchPassword(password);
 
   if (!isMatch) {
     return next(new ErrorResponse('Invalid credentials', 401));
